@@ -8,6 +8,29 @@
 <body>
 <style type="text/css">
 
+a#setYear {
+  cursor: pointer;
+  color: black;
+  padding: 2px 16px;
+  text-decoration: none;
+  display: block;
+}
+a#setYear:hover {background-color: #f1f1f1}
+.title-bar__setYear {
+  position: relative;
+  float: left;
+  font-size: 1rem;
+  line-height: 30px;
+  width: 22%;
+  padding: 0 0.5rem;
+  text-align: left;
+}
+@media screen and (min-width: 55em) {
+  .title-bar__setYear {
+    width: 12%;
+  }
+}
+
 /* Dropdown Button */
 .dropbtn {
   background-color: #f5f7f6;
@@ -67,6 +90,10 @@
 		<span class="title-bar__year">
 		  Calendar > May 2017
 		</span>
+		<span class="title-bar__setYear">
+			<input id="yearInput" type="number" min="1" max="9999">
+			<a id="setYear">Set Year</a>
+		</span>
 		<span class="title-bar__month dropdown">
 			  <span class="dropbtn">Month</span>
 			  <div class="dropdown-content">
@@ -100,12 +127,12 @@
       <span class="sidebar__nav-item"><img class="icon icons8-Down" width="22px" height="22px" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA4UlEQVRYR+2WgQnCMBBFXzdwBSdwBUfRyXQER3EUN1AOEgnxLrkkhYCkUFpI7/+Xf1fajcnHNtmfBTCawDu0sFunuzAYL4CVwEpgJbAS+P8EDsAZeBj/DbUELsAznKpE7WMkxSfgCtwVhRKAmN+AF3AM1x+JGkAUkUINwgKo1X1BagDyYElMA3Cbi7gHoASRAzSZtwBYEClAs3krgAYhQxbnI73XBrbrLdCK0p3m69bbYv79e2cgF9Agms17WpCCdPU830lvAlFHIORw93xvALO33oXRBLw+uw/hsHEUmJ7ABzErNiGyzfJcAAAAAElFTkSuQmCC"></span>
     </div>
     <h2 class="sidebar__heading">Wednesday<br>April 6</h2>
-    <ul class="sidebar__list">
+    <!-- <ul class="sidebar__list">
       <li class="sidebar__list-item sidebar__list-item--complete"><span class="list-item__time">8.30</span> Team Meeting</li>
       <li class="sidebar__list-item sidebar__list-item--complete"><span class="list-item__time">10.00</span> Lunch with Sasha</li>
       <li class="sidebar__list-item"><span class="list-item__time">2.30</span> Design Review</li>
       <li class="sidebar__list-item"><span class="list-item__time">4.00</span> Get Groceries</li>
-    </ul>
+    </ul> -->
   </aside>
 
 	<div id="calendar">
@@ -125,17 +152,34 @@
 	</div>
 </main>
 <script type="text/javascript">
+	function weekDay(index) {	
+		var weekday = new Array(7);
+		weekday[0]="Sunday";
+		weekday[1]="Monday";
+		weekday[2]="Tuesday";
+		weekday[3]="Wednesday";
+		weekday[4]="Thursday";
+		weekday[5]="Friday";
+		weekday[6]="Saturday";
+		return weekday[index];
+	}
 
 	var date = new Date();
-	calendar(date.getMonth());
+	var m = date.getMonth();
+	var yyyy = date.getFullYear();
+	calendar(yyyy,m);
+	var sideBarHeading = document.getElementsByClassName('sidebar__heading')[0];
+	var monthHumanize = document.getElementById('month' + date.getMonth()).innerText;
+	sideBarHeading.innerHTML = 'Today : ' + weekDay(date.getDay()) + '<br>' + monthHumanize + ' ' + date.getDate();
 		
-	function calendar(m) {
-		console.log(m);
+	function calendar(yyyy, m) {
+		$('.calendar__week').remove();
+		window.m = m;
 		var monthYear = document.getElementsByClassName('title-bar__year')[0];
 		var fullMonthString = document.getElementById('month' + m);
 		console.log(fullMonthString.innerText, monthYear.innerText);
-		monthYear.innerText = 'Calendar > ' + fullMonthString.innerText + ' 2017';
-		var date = new Date(2017,m,1);
+		monthYear.innerText = 'Calendar > ' + fullMonthString.innerText + ' ' + yyyy;
+		var date = new Date(yyyy,m,1);
 		var today = new Date();
 		var firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
 		var lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);//last date of current showing month
@@ -146,14 +190,14 @@
 		var j=1;
 		for (var i = 0; i < 7; i++) {
 			if(firstDate.getDay() > i) {
-				week.innerHTML = '<div class="calendar__day inactive"><span class="calendar__date">'+(lastDateEarlierMonth.getDate()-i)+'</span><span class="calendar__task">2</span></div>' + week.innerHTML;
+				week.innerHTML = '<div class="calendar__day inactive"><span class="calendar__date">'+(lastDateEarlierMonth.getDate()-i)+'</span></div>' + week.innerHTML;
 			}
 			else {
 				if(j == today.getDate() && firstDate.getMonth() == today.getMonth() && firstDate.getFullYear() == date.getFullYear()) {
-					week.innerHTML = week.innerHTML + '<div class="calendar__day today"><span class="calendar__date">'+(j)+'</span><span class="calendar__task">2</span></div>'
+					week.innerHTML = week.innerHTML + '<div class="calendar__day today"><span class="calendar__date">'+(j)+'</span></div>'
 				}
 				else {
-					week.innerHTML = week.innerHTML + '<div class="calendar__day"><span class="calendar__date">'+(j)+'</span><span class="calendar__task">2</span></div>'
+					week.innerHTML = week.innerHTML + '<div class="calendar__day"><span class="calendar__date">'+(j)+'</span></div>'
 				}
 				j++;
 			}
@@ -169,14 +213,14 @@
 			for (var i = 0; i < 7; i++, j++) {
 				if(j <= lastDate.getDate()) {
 					if(j == today.getDate() && firstDate.getMonth() == today.getMonth() && firstDate.getFullYear() == date.getFullYear()) {
-						week.innerHTML = week.innerHTML + '<div class="calendar__day today"><span class="calendar__date">'+(j)+'</span><span class="calendar__task">2</span></div>'
+						week.innerHTML = week.innerHTML + '<div class="calendar__day today"><span class="calendar__date">'+(j)+'</span></div>'
 					}
 					else {
-						week.innerHTML = week.innerHTML + '<div class="calendar__day"><span class="calendar__date">'+(j)+'</span><span class="calendar__task">2</span></div>'
+						week.innerHTML = week.innerHTML + '<div class="calendar__day"><span class="calendar__date">'+(j)+'</span></div>'
 					}
 				}
 				else {
-					week.innerHTML = week.innerHTML + '<div class="calendar__day inactive"><span class="calendar__date">'+(j - lastDate.getDate() )+'</span><span class="calendar__task">2</span></div>';
+					week.innerHTML = week.innerHTML + '<div class="calendar__day inactive"><span class="calendar__date">'+(j - lastDate.getDate() )+'</span></div>';
 				}
 
 			}
@@ -185,36 +229,64 @@
 	}
 
 	function month(m,event) {
-		$('.calendar__week').remove();
-		console.log(m);
-		calendar(m);
+		calendar(yyyy, m);
 	}
-	var monthSelect1 = document.getElementById('month0');
-	monthSelect1.addEventListener('click', month.bind({},parseInt(monthSelect1.id.split('month')[1])));
-	var monthSelect2 = document.getElementById('month1');
-	monthSelect2.addEventListener('click', month.bind({},parseInt(monthSelect2.id.split('month')[1])));
-	var monthSelect3 = document.getElementById('month2');
-	monthSelect3.addEventListener('click', month.bind({},parseInt(monthSelect3.id.split('month')[1])));
-	var monthSelect4 = document.getElementById('month3');
-	monthSelect4.addEventListener('click', month.bind({},parseInt(monthSelect4.id.split('month')[1])));
-	var monthSelect5 = document.getElementById('month4');
-	monthSelect5.addEventListener('click', month.bind({},parseInt(monthSelect5.id.split('month')[1])));
-	var monthSelect6 = document.getElementById('month5');
-	monthSelect6.addEventListener('click', month.bind({},parseInt(monthSelect6.id.split('month')[1])));
-	var monthSelect7 = document.getElementById('month6');
-	monthSelect7.addEventListener('click', month.bind({},parseInt(monthSelect7.id.split('month')[1])));
-	var monthSelect8 = document.getElementById('month7');
-	monthSelect8.addEventListener('click', month.bind({},parseInt(monthSelect8.id.split('month')[1])));
-	var monthSelect9 = document.getElementById('month8');
-	monthSelect9.addEventListener('click', month.bind({},parseInt(monthSelect9.id.split('month')[1])));
-	var monthSelect10 = document.getElementById('month9');
-	monthSelect10.addEventListener('click', month.bind({},parseInt(monthSelect10.id.split('month')[1])));
-	var monthSelect11 = document.getElementById('month10');
-	monthSelect11.addEventListener('click', month.bind({},parseInt(monthSelect11.id.split('month')[1])));
-	var monthSelect12 = document.getElementById('month11');
-	monthSelect12.addEventListener('click', month.bind({},parseInt(monthSelect12.id.split('month')[1])));
+	// var monthSelect1 = document.getElementById('month0');
+	// monthSelect1.addEventListener('click', month.bind({},parseInt(monthSelect1.id.split('month')[1])));
+	// var monthSelect2 = document.getElementById('month1');
+	// monthSelect2.addEventListener('click', month.bind({},parseInt(monthSelect2.id.split('month')[1])));
+	// var monthSelect3 = document.getElementById('month2');
+	// monthSelect3.addEventListener('click', month.bind({},parseInt(monthSelect3.id.split('month')[1])));
+	// var monthSelect4 = document.getElementById('month3');
+	// monthSelect4.addEventListener('click', month.bind({},parseInt(monthSelect4.id.split('month')[1])));
+	// var monthSelect5 = document.getElementById('month4');
+	// monthSelect5.addEventListener('click', month.bind({},parseInt(monthSelect5.id.split('month')[1])));
+	// var monthSelect6 = document.getElementById('month5');
+	// monthSelect6.addEventListener('click', month.bind({},parseInt(monthSelect6.id.split('month')[1])));
+	// var monthSelect7 = document.getElementById('month6');
+	// monthSelect7.addEventListener('click', month.bind({},parseInt(monthSelect7.id.split('month')[1])));
+	// var monthSelect8 = document.getElementById('month7');
+	// monthSelect8.addEventListener('click', month.bind({},parseInt(monthSelect8.id.split('month')[1])));
+	// var monthSelect9 = document.getElementById('month8');
+	// monthSelect9.addEventListener('click', month.bind({},parseInt(monthSelect9.id.split('month')[1])));
+	// var monthSelect10 = document.getElementById('month9');
+	// monthSelect10.addEventListener('click', month.bind({},parseInt(monthSelect10.id.split('month')[1])));
+	// var monthSelect11 = document.getElementById('month10');
+	// monthSelect11.addEventListener('click', month.bind({},parseInt(monthSelect11.id.split('month')[1])));
+	// var monthSelect12 = document.getElementById('month11');
+	// monthSelect12.addEventListener('click', month.bind({},parseInt(monthSelect12.id.split('month')[1])));
 
+	function monthEventListenerFuntion(i) {
+	  return function () {
+	  	month(i);
+	  }
+	}
+	for (var i = 0; i < 12; i++) {
+		var monthSelect = document.getElementById('month' + i);
+	  monthSelect.addEventListener("click", monthEventListenerFuntion(i));
+	}
+
+	function yearEventListenerFuntion(i) {
+	  return function () {
+	  	month(i);
+	  }
+	}
+	for (var i = 0; i < 12; i++) {
+		var monthSelect = document.getElementById('month' + i);
+	  monthSelect.addEventListener("click", yearEventListenerFuntion(i));
+	}
+
+	function setYear(){
 		
+		var yearInput = document.getElementById('yearInput');
+		window.yyyy = yearInput.value;
+		if(yyyy > 1900 && yyyy <= 9999) {
+			calendar(yyyy,m);
+		}
+	}
+
+	var button = document.getElementById('setYear');
+	button.addEventListener('click', setYear);
 
 </script>
 
